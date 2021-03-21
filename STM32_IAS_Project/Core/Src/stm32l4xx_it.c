@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include <main.hpp>
 #include "stm32l4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -211,6 +211,19 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles RCC global interrupt.
+  */
+void RCC_IRQHandler(void)
+{
+  /* USER CODE BEGIN RCC_IRQn 0 */
+
+  /* USER CODE END RCC_IRQn 0 */
+  /* USER CODE BEGIN RCC_IRQn 1 */
+
+  /* USER CODE END RCC_IRQn 1 */
+}
+
+/**
   * @brief This function handles DMA1 channel2 global interrupt.
   */
 void DMA1_Channel2_IRQHandler(void)
@@ -264,6 +277,20 @@ void DMA1_Channel7_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
 
   /* USER CODE END DMA1_Channel7_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line[9:5] interrupts.
+  */
+void EXTI9_5_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI9_5_IRQn 0 */
+
+  /* USER CODE END EXTI9_5_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+  /* USER CODE BEGIN EXTI9_5_IRQn 1 */
+
+  /* USER CODE END EXTI9_5_IRQn 1 */
 }
 
 /**
@@ -390,6 +417,20 @@ void DMA2_Channel7_IRQHandler(void)
   /* USER CODE BEGIN DMA2_Channel7_IRQn 1 */
 
   /* USER CODE END DMA2_Channel7_IRQn 1 */
+}
+
+/**
+  * @brief This function handles CRS global interrupt.
+  */
+void CRS_IRQHandler(void)
+{
+  /* USER CODE BEGIN CRS_IRQn 0 */
+
+  /* USER CODE END CRS_IRQn 0 */
+  HAL_RCCEx_CRS_IRQHandler();
+  /* USER CODE BEGIN CRS_IRQn 1 */
+
+  /* USER CODE END CRS_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
