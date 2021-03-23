@@ -1,26 +1,36 @@
 # Air Quality Sensor for indoor conditions bassed on STM32
 
-1. [Sensor.] (#Sensor)
-2. [Processor.] (#Porcessor)
-3. [Wiring.] (#Wiring)
-4. [Commands.] (#Commands)
+STM32 bassed Air Quality Sensor source code.
 
-<a name="Sensor"></a>
+1. [Sensor.](#sensor)
+2. [Processor.](#processor)
+3. [Display.](#display)
+4. [Wiring.](#wiring)
+5. [Commands.](#commands)
+
+<a name="sensor"></a>
 ## Sensor
 
-- Air Quality:  CCS811
+- Air Quality:  [CCS811](https://www.sciosense.com/products/environmental-sensors/ccs811-gas-sensor-solution/)
+- Tempearture and Humidity: TBD
+- Temperature and Barometric Pressure: TBD
 
-<a name="Processor"></a>
+<a name="processor"></a>
 ## Processor
 
 - STM32L432
 
-<a name="Wiring"></a>
+<a name="display"></a>
+## Display
+
+- TBD
+
+<a name="wiring"></a>
 ## Wiring
 
 TBD
 
-<a name="Commands"></a>
+<a name="commands"></a>
 ## Commands
 
 TBD
