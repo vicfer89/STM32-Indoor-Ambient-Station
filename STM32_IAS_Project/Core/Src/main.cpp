@@ -112,6 +112,7 @@ int main(void)
 
   printf("Sistema iniciado... \r\n");
 
+  AirQualitySensor.begin(CCS811_MODE_1S | CCS811_MODE_INT_ENABLE | CCS811_MODE_THRESHOLD_DISSABLE);
   /* USER CODE END 2 */
 
   /* Infinite loop */

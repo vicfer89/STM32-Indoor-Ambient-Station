@@ -12,7 +12,18 @@
 #define CCS811_I2C_ADDRESS2                      (0x5B << 1)
 
 #define CCS811_REG_STATUS                        0x00
+
 #define CCS811_REG_MEAS_MODE                     0x01
+#define CCS811_MODE_IDLE					     (0x00 << 4)
+#define CCS811_MODE_1S							 (0x01 << 4)
+#define CCS811_MODE_10S							 (0x02 << 4)
+#define CCS811_MODE_60S							 (0x03 << 4)
+#define CCS811_MODE_250mS						 (0x04 << 4)
+#define CCS811_MODE_INT_DISSABLE			     (0x00 << 3)
+#define CCS811_MODE_INT_ENABLE				     (0x01 << 3)
+#define CCS811_MODE_THRESHOLD_DISSABLE		     (0x00 << 3)
+#define CCS811_MODE_THRESHOLD_ENABLE		     (0x01 << 3)
+
 #define CCS811_REG_ALG_RESULT_DATA               0x02
 #define CCS811_REG_RAW_DATA                      0x03
 #define CCS811_REG_ENV_DATA                      0x05

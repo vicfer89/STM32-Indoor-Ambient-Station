@@ -12,18 +12,14 @@
 #include <main.hpp>
 #include "CCS811_Commands.hpp"
 
-typedef enum _CCS811_Mode {
-	Mode_Idle = 0,
-	Mode_1s,
-	Mode_10s,
-	Mode_60s,
-	Mode_250ms
-}CSS811_Mode;
-
 typedef struct _CCS811_Data
 {
 	uint16_t eCO2;
 	uint16_t TVOC;
+	uint8_t status;
+	uint8_t error_id;
+	uint8_t current;
+	uint8_t raw_adc;
 }CCS811_Data;
 
 class CCS811
@@ -38,7 +34,7 @@ class CCS811
 		~CCS811() {};
 
 		/* Begin sensor */
-		uint8_t begin(CSS811_Mode mode);
+		uint8_t begin(uint8_t mode);
 
 		/* Data availability setter and resetter in interrupt mode */
 		void set_DataAvail_flag(void),
@@ -48,9 +44,18 @@ class CCS811
 		bool isDataAvail(void);
 
 		/* Get sensor data */
-		CCS811_Data get_Data(void);
-		uint16_t 	get_eCO2(void),
-					get_TVOC(void);
+		void updateData(void);
+		CCS811_Data getData(void);
+		uint16_t 	getCO2(void),
+					getTVOC(void);
+		uint8_t		getStatus(void),
+					getErrId(void),
+					getCurrent(void),
+					getAdcRaw(void);
+
+		/* Sensor configuration */
+		void setEnvData(float humidity, float temperature);
+		void setThreshold(uint16_t LowToMed, uint16_t MedtoHigh);
 
 		/* Active interrupt mode */
 		void active_interrupt(void);
@@ -58,10 +63,12 @@ class CCS811
 	protected:
 
 		void writeRegister(uint8_t reg, const void * data, size_t size);
-		uint8_t readRegister(uint8_t reg, const void * data, size_t size);
+		void readRegister(uint8_t reg, const void * data, size_t size);
 
 
 	private:
+		uint8_t rxBuff[8] = {0x00};
+		uint8_t txBuff[8] = {0x00};
 
 		volatile bool f_DataAvail = false;
 		volatile bool f_InterruptMode = false;
