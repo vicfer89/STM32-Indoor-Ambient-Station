@@ -112,7 +112,7 @@ int main(void)
 
   printf("Sistema iniciado... \r\n");
 
-  AirQualitySensor.begin(CCS811_MODE_1S | CCS811_MODE_INT_ENABLE | CCS811_MODE_THRESHOLD_DISSABLE);
+  AirQualitySensor.begin(CCS811_MODE_1S);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -120,7 +120,10 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  if(AirQualitySensor.CheckDataAvail())
+	  {
+		  printf("TVOC: %d \t eCO2: %d \r\n", AirQualitySensor.getTVOC(), AirQualitySensor.getCO2());
+	  }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

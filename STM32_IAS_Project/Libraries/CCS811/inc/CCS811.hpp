@@ -41,7 +41,7 @@ class CCS811
 			 reset_DataAvail_flag(void);
 
 		/* Check if data available*/
-		bool isDataAvail(void);
+		bool CheckDataAvail(void);
 
 		/* Get sensor data */
 		void updateData(void);
@@ -62,8 +62,8 @@ class CCS811
 
 	protected:
 
-		void writeRegister(uint8_t reg, const void * data, size_t size);
-		void readRegister(uint8_t reg, const void * data, size_t size);
+		void writeRegister(uint8_t reg, uint8_t * data, size_t size);
+		void readRegister(uint8_t reg, uint8_t * data, size_t size);
 
 
 	private:
