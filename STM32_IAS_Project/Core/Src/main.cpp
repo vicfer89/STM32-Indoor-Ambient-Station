@@ -113,7 +113,7 @@ int main(void)
 
   printf("Sistema iniciado... \r\n");
   set_time();
-  AirQualitySensor.begin(CCS811_MODE_1S | CCS811_MODE_INT_ENABLE);
+  AirQualitySensor.begin(CCS811_MODE_250mS);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -130,13 +130,14 @@ int main(void)
 		  /* Get the RTC current Date */
 		   HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
 		  /* Display time Format: hh:mm:ss */
-		   printf("%02d:%02d:%02d.%03d - TVOC: %d \t eCO2: %d \r\n",
-				  	  	  gTime.Hours,
-						  gTime.Minutes,
-						  gTime.Seconds,
-						  gTime.SubSeconds,
-						  AirQualitySensor.getTVOC(),
-						  AirQualitySensor.getCO2());
+		   uint16_t val = 1000*(1 - (float)(gTime.SubSeconds + 1) / (float)(gTime.SecondFraction));
+		   printf("%02d:%02d:%02d.%03d - TVOC: %d | eCO2: %d \r\n",
+				  gTime.Hours,
+				  gTime.Minutes,
+				  gTime.Seconds,
+				  val,
+				  AirQualitySensor.getTVOC(),
+				  AirQualitySensor.getCO2());
 	  }
     /* USER CODE BEGIN 3 */
   }
@@ -232,7 +233,7 @@ void SystemClock_Config(void)
 /*  Semihosting C function for pritf usage */
 int	_write(int file, char *ptr, int len)
 {
-	//while(HAL_UART_GetState(&huart2) == HAL_UART_STATE_BUSY_TX);
+	while(HAL_UART_GetState(&huart2) == HAL_UART_STATE_BUSY_TX);
 	HAL_UART_Transmit_DMA(&huart2, (uint8_t *) ptr, len);
 	return len;
 }
