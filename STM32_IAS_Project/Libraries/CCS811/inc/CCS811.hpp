@@ -67,6 +67,8 @@ class CCS811
 
 
 	private:
+		void read_CCS811_Measurement(void);
+
 		uint8_t rxBuff[8] = {0x00};
 		uint8_t txBuff[8] = {0x00};
 

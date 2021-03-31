@@ -16,6 +16,10 @@ uint8_t CCS811::begin(uint8_t mode)
 		return ERR_I2C;
 	}
 
+	/* Reset CCS811 by asserting low GPIO pin */
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+	HAL_Delay(40);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
 	HAL_Delay(70); // Wait for 70 ms
 
 	/* HW ID register is readed */
@@ -32,12 +36,13 @@ uint8_t CCS811::begin(uint8_t mode)
 
 	/* APP is started if sensor has right ID */
 	uint8_t appStart = CCS811_BOOTLOADER_APP_START;
+	/* Using HAL_I2C_Mem_Write(...) an error occured and does not work properly */
 	HAL_I2C_Master_Transmit(I2C_Handler, Device_Addr, &appStart, 1, 300);
 	HAL_Delay(300);
 
 	printf("CCS811 APP Comenzada... \r\n");
 
-	if(mode && CCS811_MODE_INT_ENABLE)
+	if(mode & 0x08)
 	{
 		f_InterruptMode = true;
 	}
@@ -73,7 +78,7 @@ bool CCS811::CheckDataAvail(void)
 	/* In interrupt mode returns f_DataAvail flag from interrupt routine */
 	if(f_InterruptMode && f_DataAvail)
 	{
-		readRegister(CCS811_REG_ALG_RESULT_DATA,(uint8_t *) &Data,8);
+		read_CCS811_Measurement();
 		reset_DataAvail_flag();
 		return true;
 	}
@@ -81,15 +86,9 @@ bool CCS811::CheckDataAvail(void)
 	else
 	{
 		readRegister(CCS811_REG_STATUS, rxBuff,1);
-		//uint8_t err;
- 		//readRegister(CCS811_REG_ERROR_ID, &err, 1);
 		if((rxBuff[0] >> 3) & 0x01)
 		{
-			readRegister(CCS811_REG_ALG_RESULT_DATA, rxBuff,8);
-			Data.eCO2 =  (((uint16_t)rxBuff[0] << 8) | (uint16_t)rxBuff[1]);
-			Data.TVOC = (((uint16_t)rxBuff[2] << 8) | (uint16_t)rxBuff[3]);
-			Data.status = rxBuff[4];
-			Data.error_id = rxBuff[5];
+			read_CCS811_Measurement();
 			return true;
 		}
 		else
@@ -98,6 +97,15 @@ bool CCS811::CheckDataAvail(void)
 		}
 	}
 	return false;
+}
+
+void CCS811::read_CCS811_Measurement(void)
+{
+	readRegister(CCS811_REG_ALG_RESULT_DATA, rxBuff,8);
+	Data.eCO2 =  (((uint16_t)rxBuff[0] << 8) | (uint16_t)rxBuff[1]);
+	Data.TVOC = (((uint16_t)rxBuff[2] << 8) | (uint16_t)rxBuff[3]);
+	Data.status = rxBuff[4];
+	Data.error_id = rxBuff[5];
 }
 
 CCS811_Data CCS811::getData(void)

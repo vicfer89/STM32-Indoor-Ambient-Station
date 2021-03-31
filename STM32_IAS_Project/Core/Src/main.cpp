@@ -70,6 +70,7 @@ int	_write(int file, char *ptr, int len);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 CCS811 AirQualitySensor(&hi2c1);
+void set_time (void);
 /* USER CODE END 0 */
 
 /**
@@ -111,8 +112,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   printf("Sistema iniciado... \r\n");
-
-  AirQualitySensor.begin(CCS811_MODE_1S);
+  set_time();
+  AirQualitySensor.begin(CCS811_MODE_1S | CCS811_MODE_INT_ENABLE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,7 +123,20 @@ int main(void)
     /* USER CODE END WHILE */
 	  if(AirQualitySensor.CheckDataAvail())
 	  {
-		  printf("TVOC: %d \t eCO2: %d \r\n", AirQualitySensor.getTVOC(), AirQualitySensor.getCO2());
+		  RTC_DateTypeDef gDate;
+		  RTC_TimeTypeDef gTime;
+		  /* Get the RTC current Time */
+		   HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+		  /* Get the RTC current Date */
+		   HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
+		  /* Display time Format: hh:mm:ss */
+		   printf("%02d:%02d:%02d.%03d - TVOC: %d \t eCO2: %d \r\n",
+				  	  	  gTime.Hours,
+						  gTime.Minutes,
+						  gTime.Seconds,
+						  gTime.SubSeconds,
+						  AirQualitySensor.getTVOC(),
+						  AirQualitySensor.getCO2());
 	  }
     /* USER CODE BEGIN 3 */
   }
@@ -147,8 +161,9 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSEState = RCC_LSE_OFF;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
@@ -180,7 +195,7 @@ void SystemClock_Config(void)
                               |RCC_PERIPHCLK_I2C1;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
-  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
@@ -217,17 +232,45 @@ void SystemClock_Config(void)
 /*  Semihosting C function for pritf usage */
 int	_write(int file, char *ptr, int len)
 {
-	while(HAL_UART_GetState(&huart2) == HAL_UART_STATE_BUSY_TX);
+	//while(HAL_UART_GetState(&huart2) == HAL_UART_STATE_BUSY_TX);
 	HAL_UART_Transmit_DMA(&huart2, (uint8_t *) ptr, len);
 	return len;
 }
 
+/* Callback for EXTI interruption*/
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == GPIO_PIN_8)
 	{
 		AirQualitySensor.set_DataAvail_flag();
 	}
+}
+
+/* Function to activate RTC backup and set initial time - NOTICE:
+ * RTC DOES PRESSENT AN ABNORMAL BEHAVIOR WHEN
+ * READING IF THIS FUNCTION IS NOT STANTIATED AND CALLED AT CODE */
+void set_time (void)
+{
+  RTC_TimeTypeDef sTime;
+  RTC_DateTypeDef sDate;
+  sTime.Hours = 0x00; // set hours
+  sTime.Minutes = 0x00; // set minutes
+  sTime.Seconds = 0x00; // set seconds
+  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+  {
+	  //assert_failed(__FILE__, __LINE__);
+  }
+  sDate.WeekDay = RTC_WEEKDAY_WEDNESDAY; //  day
+  sDate.Month = RTC_MONTH_MARCH; //  month
+  sDate.Date = 0x31; // date
+  sDate.Year = 0x21; // year
+  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
+  {
+	  //assert_failed(__FILE__, __LINE__);
+  }
+  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0x32F2); // backup register
 }
 
 /* USER CODE END 4 */
