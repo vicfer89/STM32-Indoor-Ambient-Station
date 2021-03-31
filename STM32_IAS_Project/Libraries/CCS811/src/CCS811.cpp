@@ -70,16 +70,18 @@ void CCS811::set_DataAvail_flag(void)
 
 void CCS811::reset_DataAvail_flag(void)
 {
-	f_DataAvail = false;
+	if(f_InterruptMode & f_DataAvail)
+		f_DataAvail = false;
+	else
+		return;
 }
 
 bool CCS811::CheckDataAvail(void)
 {
 	/* In interrupt mode returns f_DataAvail flag from interrupt routine */
-	if(f_InterruptMode && f_DataAvail)
+	if(f_InterruptMode & f_DataAvail)
 	{
 		read_CCS811_Measurement();
-		reset_DataAvail_flag();
 		return true;
 	}
 	/* In polling mode, checks if data is available from CCS811 */

@@ -113,7 +113,7 @@ int main(void)
 
   printf("Sistema iniciado... \r\n");
   set_time();
-  AirQualitySensor.begin(CCS811_MODE_250mS);
+  AirQualitySensor.begin(CCS811_MODE_250mS | CCS811_MODE_INT_ENABLE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -138,6 +138,7 @@ int main(void)
 				  val,
 				  AirQualitySensor.getTVOC(),
 				  AirQualitySensor.getCO2());
+		   AirQualitySensor.reset_DataAvail_flag();
 	  }
     /* USER CODE BEGIN 3 */
   }
