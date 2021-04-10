@@ -27,11 +27,14 @@ class CCS811
 	public:
 
 		/* Class Constructor */
-		CCS811( I2C_HandleTypeDef * _I2C_Handler = NULL, uint8_t _Device_Addr = CCS811_I2C_ADDRESS1 )
-				: I2C_Handler(_I2C_Handler), Device_Addr(_Device_Addr) {};
+		CCS811( I2C_HandleTypeDef * _I2C_Handler = NULL, uint8_t _Device_Addr = CCS811_I2C_ADDRESS1 ) :
+				I2C_Handler(_I2C_Handler),
+				Device_Addr(_Device_Addr)
+		{};
 
 		/* Class Destructor */
-		~CCS811() {};
+		~CCS811()
+		{};
 
 		/* Begin sensor */
 		uint8_t begin(uint8_t mode);

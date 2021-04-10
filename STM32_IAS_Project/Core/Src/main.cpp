@@ -65,6 +65,7 @@ extern "C"
 #endif
 int	_write(int file, char *ptr, int len);
 
+void check_CCS811_Data(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -120,26 +121,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  check_CCS811_Data();
     /* USER CODE END WHILE */
-	  if(AirQualitySensor.CheckDataAvail())
-	  {
-		  RTC_DateTypeDef gDate;
-		  RTC_TimeTypeDef gTime;
-		  /* Get the RTC current Time */
-		   HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
-		  /* Get the RTC current Date */
-		   HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
-		  /* Display time Format: hh:mm:ss */
-		   uint16_t val = 1000*(1 - (float)(gTime.SubSeconds + 1) / (float)(gTime.SecondFraction));
-		   printf("%02d:%02d:%02d.%03d - TVOC: %d | eCO2: %d \r\n",
-				  gTime.Hours,
-				  gTime.Minutes,
-				  gTime.Seconds,
-				  val,
-				  AirQualitySensor.getTVOC(),
-				  AirQualitySensor.getCO2());
-		   AirQualitySensor.reset_DataAvail_flag();
-	  }
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -273,6 +257,29 @@ void set_time (void)
 	  //assert_failed(__FILE__, __LINE__);
   }
   HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0x32F2); // backup register
+}
+
+void check_CCS811_Data(void)
+{
+	  if(AirQualitySensor.CheckDataAvail())
+	  {
+		  RTC_DateTypeDef gDate;
+		  RTC_TimeTypeDef gTime;
+		  /* Get the RTC current Time */
+		   HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+		  /* Get the RTC current Date */
+		   HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
+		  /* Display time Format: hh:mm:ss */
+		   uint16_t val = 1000*(1 - (float)(gTime.SubSeconds + 1) / (float)(gTime.SecondFraction));
+		   printf("%02d:%02d:%02d.%03d - TVOC: %d | eCO2: %d \r\n",
+				  gTime.Hours,
+				  gTime.Minutes,
+				  gTime.Seconds,
+				  val,
+				  AirQualitySensor.getTVOC(),
+				  AirQualitySensor.getCO2());
+		   AirQualitySensor.reset_DataAvail_flag();
+	  }
 }
 
 /* USER CODE END 4 */
