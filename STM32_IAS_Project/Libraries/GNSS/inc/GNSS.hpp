@@ -47,8 +47,16 @@ class GNSS
 		/* Class Construcctor */
 		GNSS( UART_HandleTypedef * _huart = NULL ) :
 			  huart_handler(_huart),
-			  GNSS_Data({0,0,0},{0,0,0,0,0,0},{0,0})
-		{};
+			  GNSS_Data({
+					   	 .position = {0,0,0},
+					   	 .datetime = {0,0,0,0,0,0},
+						 .DOP = {0,0}
+						})
+		{
+			/* RX ISR Pointer to handler function*/
+			huart_handler->RxISR = &ISR_Rx_GNSS_UART;
+			huart_handler->TxISR = &ISR_Tx_GNSS_UART;
+		};
 
 		/* Class Destructor */
 		~GNSS()
@@ -79,6 +87,16 @@ class GNSS
 		void reset_flag_pps_avail(void)
 		{
 			flag_pps_avail = false;
+		}
+
+		void ISR_Rx_GNSS_UART(struct __UART_HandleTypeDef *huart)
+		{
+
+		}
+
+		void ISR_Tx_GNSS_UART(struct __UART_HandleTypeDef *huart)
+		{
+
 		}
 
 	private:
