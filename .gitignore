@@ -1,2 +1,4 @@
 .metadata/
 STM32_IAS_Project/Debug/
+*.cfg
+.settings/
